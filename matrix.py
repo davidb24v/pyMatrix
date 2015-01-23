@@ -11,28 +11,16 @@ class Matrix(object):
 
     def send(self, stuff):
         try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         except socket.error, msg:
             sys.stderr.write("[ERROR] %s\n" % msg[1])
             sys.exit(1)
 
         try:
-            sock.connect((self.ip, self.port))
+            sock.sendto(stuff, (self.ip, self.port))
         except socket.error, msg:
             sys.stderr.write("[ERROR] %s\n" % msg[1])
             sys.exit(2)
-
-        # Send the data
-        sock.send(stuff)
-
-        # Wait for reply
-        data = sock.recv(16)
-        string = ""
-        while len(data):
-            string = string + data
-            data = sock.recv(16)
-
-        assert string.strip() == "OK"
 
         sock.close()
 
